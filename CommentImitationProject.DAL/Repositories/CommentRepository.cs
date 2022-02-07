@@ -10,7 +10,7 @@ namespace CommentImitationProject.DAL.Repositories
     {
         private readonly DbSet<Comment> _table;
 
-        protected CommentRepository(ProjectContext projectContext) : base(projectContext)
+        public CommentRepository(ProjectContext projectContext) : base(projectContext)
         {
             _table = projectContext.Comments;
         }

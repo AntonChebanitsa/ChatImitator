@@ -25,7 +25,7 @@ namespace CommentImitationProject
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOptions();
+            services.AddControllers().ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
 
             services.AddDbContext<ProjectContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -43,10 +43,6 @@ namespace CommentImitationProject
             var mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            services.AddControllers()
-                .ConfigureApiBehaviorOptions(options =>
-                    options.SuppressModelStateInvalidFilter = true);
-
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "ChatProject.WebAPI", Version = "v1"}); });
         }
 
@@ -58,7 +54,7 @@ namespace CommentImitationProject
             }
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GoodNewsProject.WebAPI v1"));
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"));
 
             app.UseStaticFiles();
 
