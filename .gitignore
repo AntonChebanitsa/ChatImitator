@@ -1,5 +1,9 @@
 .idea
 .vs
-bin
+.bin
+.dll
+.pdb
+.cache
+.exe
 obj
 logs
