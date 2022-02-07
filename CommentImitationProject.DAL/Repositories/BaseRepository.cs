@@ -10,9 +10,9 @@ namespace CommentImitationProject.DAL.Repositories
 {
     public class BaseRepository<T> : IRepository<T> where T : class, IBaseEntity
     {
-        public readonly DbSet<T> _table;
+        private readonly DbSet<T> _table;
 
-        public BaseRepository(DbContext context)
+        protected BaseRepository(DbContext context)
         {
             _table = context.Set<T>();
         }
