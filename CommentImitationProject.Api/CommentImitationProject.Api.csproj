@@ -6,8 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CommentImitationProject.DAL\CommentImitationProject.DAL.csproj" />
-      <ProjectReference Include="..\CommentImitationProject.Services\CommentImitationProject.Services.csproj" />
+        <ProjectReference Include="..\CommentImitationProject.DAL\CommentImitationProject.DAL.csproj"/>
+        <ProjectReference Include="..\CommentImitationProject.Services\CommentImitationProject.Services.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

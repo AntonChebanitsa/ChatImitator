@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CommentImitationProject.Controllers
 {
+    [Route("api/[controller]")]
     public class CommentController : Controller
     {
         private readonly ICommentService _commentService;
@@ -37,7 +38,7 @@ namespace CommentImitationProject.Controllers
             return Ok(comments);
         }
 
-        [HttpGet("postid={postId:guid}")]
+        [HttpGet("{postId:guid}")]
         public IActionResult GetByPostId(Guid postId)
         {
             IEnumerable<CommentDto> comments;
@@ -58,7 +59,7 @@ namespace CommentImitationProject.Controllers
             return Ok(comments);
         }
 
-        [HttpGet("userid={userId:guid}")]
+        [HttpGet("{userId:guid}")]
         public IActionResult GetByUserId(Guid userId)
         {
             IEnumerable<CommentDto> comments;
@@ -113,7 +114,7 @@ namespace CommentImitationProject.Controllers
             return Ok();
         }
 
-        [HttpDelete("{commentId}")]
+        [HttpDelete("{commentId:guid}")]
         public async Task<IActionResult> Delete(Guid commentId)
         {
             try
