@@ -12,7 +12,7 @@ namespace CommentImitationProject.DAL.Repositories
     {
         private readonly DbSet<T> _table;
 
-        protected BaseRepository(DbContext context)
+        public BaseRepository(DbContext context)
         {
             _table = context.Set<T>();
         }
