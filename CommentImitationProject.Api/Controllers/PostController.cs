@@ -22,10 +22,6 @@ namespace CommentImitationProject.Controllers
             {
                 return Ok(await _postService.GetAll());
             }
-            catch (NullReferenceException)
-            {
-                return NotFound();
-            }
             catch (Exception)
             {
                 return BadRequest();

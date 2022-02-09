@@ -9,7 +9,7 @@ namespace CommentImitationProject.Services.Interfaces
     {
         Task<CommentDto> GetCommentById(Guid id);
 
-        Task<IEnumerable<CommentDto>> GetAllComments();
+        Task<IEnumerable<CommentDto>> GetAll();
 
         Task<IEnumerable<CommentDto>> GetUserCommentsByUserId(Guid userId);
 

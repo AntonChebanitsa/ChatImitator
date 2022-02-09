@@ -37,11 +37,7 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                return Ok(await _commentService.GetAllComments());
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound();
+                return Ok(await _commentService.GetAll());
             }
             catch (Exception)
             {
