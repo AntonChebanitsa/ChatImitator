@@ -21,7 +21,7 @@ namespace CommentImitationProject.Services
             _mapper = mapper;
         }
 
-        public async Task<CommentDto> GetConcreteComment(Guid id)
+        public async Task<CommentDto> GetCommentById(Guid id)
         {
             try
             {
@@ -35,35 +35,28 @@ namespace CommentImitationProject.Services
             }
         }
 
-        public IEnumerable<CommentDto> GetAllComments()
+        public async Task<IEnumerable<CommentDto>> GetAllComments()
         {
-            var entities = _unitOfWork.Comments.GetAll();
+            var entities = await _unitOfWork.Comments.GetAll();
 
             return entities.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public IEnumerable<CommentDto> GetUserComments(Guid userId)
+        public async Task<IEnumerable<CommentDto>> GetUserCommentsByUserId(Guid userId)
         {
-            var comments = _unitOfWork.Comments.GetUserComments(userId);
+            var comments = await _unitOfWork.Comments.GetUserComments(userId);
 
             return comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public IEnumerable<CommentDto> GetPostComments(Guid postId)
+        public async Task<IEnumerable<CommentDto>> GetPostCommentsByPostId(Guid postId)
         {
-            var comments = _unitOfWork.Comments.GetPostComments(postId);
+            var comments = await _unitOfWork.Comments.GetPostComments(postId);
 
             return comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public IEnumerable<CommentDto> GetByUserAndPost(Guid postId, Guid userId)
-        {
-            var comments = _unitOfWork.Comments.GetByPostAndUser(postId, userId);
-
-            return comments.Select(x => _mapper.Map<CommentDto>(x));
-        }
-
-        public async Task CreateComment(string text, Guid userId, Guid postId)
+        public async Task Create(string text, Guid userId, Guid postId)
         {
             var newComment = new Comment {AuthorId = userId, PostId = postId, Text = text, LastEditDate = DateTime.UtcNow};
 
@@ -71,51 +64,21 @@ namespace CommentImitationProject.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task EditComment(Guid id, string text)
+        public async Task Edit(Guid id, string text)
         {
-            try
-            {
-                var commentToEdit = await _unitOfWork.Comments.GetById(id);
-                commentToEdit.Text = text;
-                commentToEdit.LastEditDate = DateTime.UtcNow;
+            var commentToEdit = await _unitOfWork.Comments.GetById(id);
+            commentToEdit.Text = text;
+            commentToEdit.LastEditDate = DateTime.UtcNow;
 
-                _unitOfWork.Comments.Update(commentToEdit);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-
-        public async Task DeleteComment(Guid id)
-        {
-            try
-            {
-                var commentToDelete = await _unitOfWork.Comments.GetById(id);
-
-                _unitOfWork.Comments.Remove(commentToDelete);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-
-        public async Task DeleteUserComments(Guid userId)
-        {
-            var userComments = _unitOfWork.Comments.GetUserComments(userId);
-
-            _unitOfWork.Comments.RemoveRange(userComments);
+            _unitOfWork.Comments.Update(commentToEdit);
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task DeletePostComments(Guid postId)
+        public async Task Delete(Guid id)
         {
-            var userComments = _unitOfWork.Comments.GetPostComments(postId);
+            var commentToDelete = await _unitOfWork.Comments.GetById(id);
 
-            _unitOfWork.Comments.RemoveRange(userComments);
+            _unitOfWork.Comments.Remove(commentToDelete);
             await _unitOfWork.CommitAsync();
         }
     }
