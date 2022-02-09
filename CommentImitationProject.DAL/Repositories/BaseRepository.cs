@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using CommentImitationProject.DAL.Entities;
 using CommentImitationProject.DAL.Repositories.Interfaces;
@@ -17,9 +16,9 @@ namespace CommentImitationProject.DAL.Repositories
             _table = context.Set<T>();
         }
 
-        public IQueryable<T> GetAll()
+        public async Task<List<T>> GetAll()
         {
-            return _table;
+            return await _table.ToListAsync();
         }
 
         public async Task<T> GetById(Guid id)
@@ -39,11 +38,11 @@ namespace CommentImitationProject.DAL.Repositories
             await _table.AddAsync(entity);
         }
 
-        public void Remove(T entity)
+        public void Update(T entity)
         {
             if (entity != null)
             {
-                _table.Remove(entity);
+                _table.Update(entity);
             }
             else
             {
@@ -51,16 +50,11 @@ namespace CommentImitationProject.DAL.Repositories
             }
         }
 
-        public void RemoveRange(IEnumerable<T> entities)
-        {
-            _table.RemoveRange(entities);
-        }
-
-        public void Update(T entity)
+        public void Remove(T entity)
         {
             if (entity != null)
             {
-                _table.Update(entity);
+                _table.Remove(entity);
             }
             else
             {

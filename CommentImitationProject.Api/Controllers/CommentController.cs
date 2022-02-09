@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using CommentImitationProject.DTO;
 using CommentImitationProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,14 +15,12 @@ namespace CommentImitationProject.Controllers
             _commentService = commentService;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpGet("{commentId:guid}")]
+        public async Task<IActionResult> GetById(Guid commentId)
         {
-            IEnumerable<CommentDto> comments;
-
             try
             {
-                comments = _commentService.GetAllComments();
+                return Ok(await _commentService.GetCommentById(commentId));
             }
             catch (NullReferenceException)
             {
@@ -34,18 +30,31 @@ namespace CommentImitationProject.Controllers
             {
                 return BadRequest();
             }
+        }
 
-            return Ok(comments);
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                return Ok(await _commentService.GetAllComments());
+            }
+            catch (NullReferenceException)
+            {
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet("{postId:guid}")]
-        public IActionResult GetByPostId(Guid postId)
+        public async Task<IActionResult> GetByPostId(Guid postId)
         {
-            IEnumerable<CommentDto> comments;
-
             try
             {
-                comments = _commentService.GetPostComments(postId);
+                return Ok(await _commentService.GetPostCommentsByPostId(postId));
             }
             catch (NullReferenceException)
             {
@@ -55,18 +64,14 @@ namespace CommentImitationProject.Controllers
             {
                 return BadRequest();
             }
-
-            return Ok(comments);
         }
 
         [HttpGet("{userId:guid}")]
-        public IActionResult GetByUserId(Guid userId)
+        public async Task<IActionResult> GetByUserId(Guid userId)
         {
-            IEnumerable<CommentDto> comments;
-
             try
             {
-                comments = _commentService.GetUserComments(userId);
+                return Ok(await _commentService.GetUserCommentsByUserId(userId));
             }
             catch (NullReferenceException)
             {
@@ -76,8 +81,6 @@ namespace CommentImitationProject.Controllers
             {
                 return BadRequest();
             }
-
-            return Ok(comments);
         }
 
         [HttpPost]
@@ -85,14 +88,14 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                await _commentService.CreateComment(text, userId, postId);
+                await _commentService.Create(text, userId, postId);
+
+                return Ok();
             }
             catch (Exception)
             {
                 return BadRequest();
             }
-
-            return Accepted();
         }
 
         [HttpPatch]
@@ -100,7 +103,9 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                await _commentService.EditComment(commentId, text);
+                await _commentService.Edit(commentId, text);
+
+                return Ok();
             }
             catch (NullReferenceException)
             {
@@ -110,8 +115,6 @@ namespace CommentImitationProject.Controllers
             {
                 return BadRequest();
             }
-
-            return Ok();
         }
 
         [HttpDelete("{commentId:guid}")]
@@ -119,7 +122,9 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                await _commentService.DeleteComment(commentId);
+                await _commentService.Delete(commentId);
+
+                return Ok();
             }
             catch (NullReferenceException)
             {
@@ -129,8 +134,6 @@ namespace CommentImitationProject.Controllers
             {
                 return BadRequest();
             }
-
-            return Ok();
         }
     }
 }
