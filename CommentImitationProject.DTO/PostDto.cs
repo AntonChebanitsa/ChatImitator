@@ -12,8 +12,8 @@ namespace CommentImitationProject.DTO
 
         public DateTime PublicationDate { get; set; }
 
-        public virtual User Author { get; set; }
+        public User Author { get; set; }
 
-        public virtual ICollection<Comment> Comments { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }

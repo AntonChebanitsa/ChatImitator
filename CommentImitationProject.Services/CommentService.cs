@@ -35,7 +35,7 @@ namespace CommentImitationProject.Services
             }
         }
 
-        public async Task<IEnumerable<CommentDto>> GetAllComments()
+        public async Task<IEnumerable<CommentDto>> GetAll()
         {
             var entities = await _unitOfWork.Comments.GetAll();
 
