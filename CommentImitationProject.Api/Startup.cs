@@ -16,7 +16,7 @@ namespace CommentImitationProject
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
         {
@@ -38,6 +38,7 @@ namespace CommentImitationProject
 
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IPostService, PostService>();
+            services.AddTransient<IUserService, UserService>();
 
             var mapperConfig = new MapperConfiguration(mc => { mc.AddProfile(new Services.AutoMapper()); });
 
