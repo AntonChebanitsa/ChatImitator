@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CommentImitationProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommentImitationProject.Controllers
@@ -7,34 +8,115 @@ namespace CommentImitationProject.Controllers
     [Route("api/[controller]")]
     public class PostController : Controller
     {
-        [HttpGet]
-        public Task<IActionResult> GetAll()
+        private readonly IPostService _postService;
+
+        public PostController(IPostService postService)
         {
-            throw new NotImplementedException();
+            _postService = postService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                return Ok(await _postService.GetAll());
+            }
+            catch (NullReferenceException)
+            {
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet("{postId:guid}")]
-        public Task<IActionResult> GetByPostId(Guid postId)
+        public async Task<IActionResult> GetById(Guid postId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return Ok(await _postService.GetById(postId));
+            }
+            catch (NullReferenceException)
+            {
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("{userId:guid}")]
+        public async Task<IActionResult> GetUserPostsById(Guid userId)
+        {
+            try
+            {
+                return Ok(await _postService.GetUserPostsById(userId));
+            }
+            catch (NullReferenceException)
+            {
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
-        public Task<IActionResult> Create([FromBody] string text, Guid userId)
+        public async Task<IActionResult> Create([FromBody] Guid userId, string text)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _postService.Create(userId, text);
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPatch]
-        public Task<IActionResult> Update([FromBody] Guid postId, string text)
+        public async Task<IActionResult> Update([FromBody] Guid postId, string text)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _postService.Update(postId, text);
+
+                return Ok();
+            }
+            catch (NullReferenceException)
+            {
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpDelete("{postId:guid}")]
-        public Task<IActionResult> Delete(Guid postId)
+        public async Task<IActionResult> Delete(Guid postId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _postService.Delete(postId);
+
+                return Ok();
+            }
+            catch (NullReferenceException)
+            {
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
     }
 }
