@@ -10,7 +10,7 @@ namespace CommentImitationProject.Services
         {
             CreateMap<Comment, CommentDto>().ReverseMap();
             // CreateMap<User, UserDto>().ReverseMap();
-            // CreateMap<Post, PostDto>().ReverseMap();
+            CreateMap<Post, PostDto>().ReverseMap();
         }
     }
 }

@@ -37,6 +37,7 @@ namespace CommentImitationProject
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddTransient<ICommentService, CommentService>();
+            services.AddTransient<IPostService, PostService>();
 
             var mapperConfig = new MapperConfiguration(mc => { mc.AddProfile(new Services.AutoMapper()); });
 
