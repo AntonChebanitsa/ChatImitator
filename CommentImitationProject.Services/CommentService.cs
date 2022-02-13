@@ -21,39 +21,40 @@ namespace CommentImitationProject.Services
             _mapper = mapper;
         }
 
-        public async Task<CommentDto> GetCommentById(Guid id)
-        {
-            try
-            {
-                var entity = await _unitOfWork.Comments.GetById(id);
-
-                return _mapper.Map<CommentDto>(entity);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
         public async Task<IEnumerable<CommentDto>> GetAll()
         {
-            var entities = await _unitOfWork.Comments.GetAll();
+            var comments = await _unitOfWork.Comments.GetAll();
 
-            return entities.Select(x => _mapper.Map<CommentDto>(x));
+            return comments.Count == 0
+                ? new List<CommentDto>()
+                : comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public async Task<IEnumerable<CommentDto>> GetUserCommentsByUserId(Guid userId)
+        public async Task<CommentDto> GetById(Guid id)
+        {
+            var comment = await _unitOfWork.Comments.GetById(id);
+
+            return comment == null
+                ? throw new NullReferenceException()
+                : _mapper.Map<CommentDto>(comment);
+        }
+
+        public async Task<IEnumerable<CommentDto>> GetCommentsByUserId(Guid userId)
         {
             var comments = await _unitOfWork.Comments.GetUserComments(userId);
 
-            return comments.Select(x => _mapper.Map<CommentDto>(x));
+            return !comments.Any()
+                ? new List<CommentDto>()
+                : comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public async Task<IEnumerable<CommentDto>> GetPostCommentsByPostId(Guid postId)
+        public async Task<IEnumerable<CommentDto>> GetCommentsByPostId(Guid postId)
         {
             var comments = await _unitOfWork.Comments.GetPostComments(postId);
 
-            return comments.Select(x => _mapper.Map<CommentDto>(x));
+            return !comments.Any()
+                ? new List<CommentDto>()
+                : comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
         public async Task Create(string text, Guid userId, Guid postId)
@@ -64,21 +65,28 @@ namespace CommentImitationProject.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Edit(Guid id, string text)
+        public async Task Update(Guid id, string text)
         {
-            var commentToEdit = await _unitOfWork.Comments.GetById(id);
-            commentToEdit.Text = text;
-            commentToEdit.LastEditDate = DateTime.UtcNow;
+            var comment = await _unitOfWork.Comments.GetById(id);
 
-            _unitOfWork.Comments.Update(commentToEdit);
+            if (comment == null)
+                throw new NullReferenceException();
+
+            comment.Text = text;
+            comment.LastEditDate = DateTime.UtcNow;
+
+            _unitOfWork.Comments.Update(comment);
             await _unitOfWork.CommitAsync();
         }
 
         public async Task Delete(Guid id)
         {
-            var commentToDelete = await _unitOfWork.Comments.GetById(id);
+            var comment = await _unitOfWork.Comments.GetById(id);
 
-            _unitOfWork.Comments.Remove(commentToDelete);
+            if (comment == null)
+                throw new NullReferenceException();
+
+            _unitOfWork.Comments.Remove(comment);
             await _unitOfWork.CommitAsync();
         }
     }

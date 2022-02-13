@@ -7,17 +7,17 @@ namespace CommentImitationProject.Services.Interfaces
 {
     public interface ICommentService
     {
-        Task<CommentDto> GetCommentById(Guid id);
+        Task<CommentDto> GetById(Guid id);
 
         Task<IEnumerable<CommentDto>> GetAll();
 
-        Task<IEnumerable<CommentDto>> GetUserCommentsByUserId(Guid userId);
+        Task<IEnumerable<CommentDto>> GetCommentsByUserId(Guid userId);
 
-        Task<IEnumerable<CommentDto>> GetPostCommentsByPostId(Guid postId);
+        Task<IEnumerable<CommentDto>> GetCommentsByPostId(Guid postId);
 
         Task Create(string text, Guid userId, Guid postId);
 
-        Task Edit(Guid id, string text);
+        Task Update(Guid id, string text);
 
         Task Delete(Guid id);
     }

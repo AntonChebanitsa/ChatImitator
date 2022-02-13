@@ -23,52 +23,61 @@ namespace CommentImitationProject.Services
 
         public async Task<IEnumerable<PostDto>> GetAll()
         {
-            var entities = await _unitOfWork.Posts.GetAll();
+            var posts = await _unitOfWork.Posts.GetAll();
 
-            return entities.Select(x => _mapper.Map<PostDto>(x));
-        }
-
-        public async Task<IEnumerable<PostDto>> GetUserPostsById(Guid userId)
-        {
-            var entities = await _unitOfWork.Posts.GetPostsByUserId(userId);
-
-            return entities.Select(x => _mapper.Map<PostDto>(x));
+            return posts.Count == 0
+                ? new List<PostDto>()
+                : posts.Select(x => _mapper.Map<PostDto>(x));
         }
 
         public async Task<PostDto> GetById(Guid postId)
         {
-            var entity = await _unitOfWork.Posts.GetById(postId);
+            var post = await _unitOfWork.Posts.GetById(postId);
 
-            return _mapper.Map<PostDto>(entity);
+            return post == null
+                ? throw new NullReferenceException()
+                : _mapper.Map<PostDto>(post);
+        }
+
+        public async Task<IEnumerable<PostDto>> GetUserPostsById(Guid userId)
+        {
+            var posts = (await _unitOfWork.Posts.GetPostsByUserId(userId)).ToList();
+
+            return !posts.Any()
+                ? new List<PostDto>()
+                : posts.Select(x => _mapper.Map<PostDto>(x));
         }
 
         public async Task Create(Guid userId, string text)
         {
-            var entity = new Post
-            {
-                Text = text,
-                PublicationDate = DateTime.UtcNow,
-                AuthorId = userId
-            };
+            var post = new Post {Text = text, PublicationDate = DateTime.UtcNow, AuthorId = userId};
 
-            await _unitOfWork.Posts.CreateAsync(entity);
+            await _unitOfWork.Posts.CreateAsync(post);
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task Update(Guid postId, string text)
         {
-            var entity = await _unitOfWork.Posts.GetById(postId);
+            var post = await _unitOfWork.Posts.GetById(postId);
 
-            entity.Text = text;
+            if (post == null)
+                throw new NullReferenceException();
 
-            _unitOfWork.Posts.Update(entity);
+            post.Text = text;
+
+            _unitOfWork.Posts.Update(post);
             await _unitOfWork.CommitAsync();
         }
 
         public async Task Delete(Guid postId)
         {
-            var entity = await _unitOfWork.Posts.GetById(postId);
+            var post = await _unitOfWork.Posts.GetById(postId);
 
-            _unitOfWork.Posts.Remove(entity);
+            if (post == null)
+                throw new NullReferenceException();
+
+            _unitOfWork.Posts.Remove(post);
+            await _unitOfWork.CommitAsync();
         }
     }
 }
