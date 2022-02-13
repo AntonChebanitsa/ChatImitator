@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.NUnit3;
-using AutoMapper;
-using CommentImitationProject.DAL;
 using CommentImitationProject.DAL.Entities;
 using CommentImitationProject.DTO;
 using CommentImitationProject.Services;
@@ -17,34 +15,28 @@ using NUnit.Framework;
 namespace CommentImitationProject.UnitTests.Services
 {
     [TestFixture]
-    public class CommentServiceTests
+    public class CommentServiceTests : ServicesTestFixture
     {
-        private Mock<IUnitOfWork> _mockUnitOfWork;
-        private Mock<IMapper> _mockMapper;
         private ICommentService _commentService;
-        private Fixture _fixture;
 
         [SetUp]
         public void Setup()
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockMapper = new Mock<IMapper>();
-            _commentService = new CommentService(_mockUnitOfWork.Object, _mockMapper.Object);
-            _fixture = new Fixture();
+            _commentService = new CommentService(MockUnitOfWork.Object, MockMapper.Object);
         }
 
         [Test]
         public async Task GetAll_NoComments_ShouldReturnEmptyCollection()
         {
             // Arrange
-            _mockUnitOfWork.Setup(x => x.Comments.GetAll())
+            MockUnitOfWork.Setup(x => x.Comments.GetAll())
                 .ReturnsAsync(new List<Comment>());
 
             // Act
             var result = await _commentService.GetAll();
 
             // Assert
-            _mockUnitOfWork.Verify(x => x.Comments.GetAll());
+            MockUnitOfWork.Verify(x => x.Comments.GetAll());
             result.Should().BeEquivalentTo(new List<Comment>());
         }
 
@@ -52,12 +44,12 @@ namespace CommentImitationProject.UnitTests.Services
         public async Task GetAll_WithSomeComments_ShouldReturnCollection()
         {
             // Arrange
-            var comments = _fixture.Build<Comment>()
+            var comments = Fixture.Build<Comment>()
                 .Without(x => x.Author)
                 .Without(x => x.Post)
                 .CreateMany().ToList();
 
-            _mockUnitOfWork.Setup(x => x.Comments.GetAll())
+            MockUnitOfWork.Setup(x => x.Comments.GetAll())
                 .ReturnsAsync(comments);
 
             var expectedPosts = comments.Select(comment => new CommentDto
@@ -68,7 +60,7 @@ namespace CommentImitationProject.UnitTests.Services
             }).ToList();
 
             var calls = 0;
-            _mockMapper.Setup(x => x.Map<CommentDto>(It.IsAny<Comment>()))
+            MockMapper.Setup(x => x.Map<CommentDto>(It.IsAny<Comment>()))
                 .Returns(() => expectedPosts[calls])
                 .Callback(() => calls++);
 
@@ -83,13 +75,13 @@ namespace CommentImitationProject.UnitTests.Services
         public async Task GetById_CommentExists_ShouldReturnUser(Guid commentId)
         {
             // Arrange
-            var comment = _fixture.Build<Comment>()
+            var comment = Fixture.Build<Comment>()
                 .With(x => x.Id, commentId)
                 .Without(x => x.Author)
                 .Without(x => x.Post)
                 .Create();
 
-            _mockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
+            MockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
                 .ReturnsAsync(comment);
 
             var expectedComment = new CommentDto
@@ -99,14 +91,14 @@ namespace CommentImitationProject.UnitTests.Services
                 LastEditDate = comment.LastEditDate
             };
 
-            _mockMapper.Setup(x => x.Map<CommentDto>(comment))
+            MockMapper.Setup(x => x.Map<CommentDto>(comment))
                 .Returns(expectedComment);
 
             // Act
             var result = await _commentService.GetById(commentId);
 
             // Assert
-            _mockUnitOfWork.Verify(x => x.Comments.GetById(commentId));
+            MockUnitOfWork.Verify(x => x.Comments.GetById(commentId));
             result.Should().BeEquivalentTo(expectedComment);
         }
 
@@ -114,7 +106,7 @@ namespace CommentImitationProject.UnitTests.Services
         public void GetById_NoPost_ShouldThrowNullReferenceException()
         {
             // Arrange
-            _mockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
+            MockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
                 .ReturnsAsync((Comment) null);
 
             // Assert
@@ -125,14 +117,14 @@ namespace CommentImitationProject.UnitTests.Services
         public async Task GetCommentsByUserId_NoPosts_ShouldReturnEmptyCollection(Guid userId)
         {
             // Arrange
-            _mockUnitOfWork.Setup(x => x.Comments.GetUserComments(userId))
+            MockUnitOfWork.Setup(x => x.Comments.GetUserComments(userId))
                 .ReturnsAsync(new List<Comment>());
 
             // Act
             var result = await _commentService.GetCommentsByUserId(userId);
 
             // Assert
-            _mockUnitOfWork.Verify(x => x.Comments.GetUserComments(userId));
+            MockUnitOfWork.Verify(x => x.Comments.GetUserComments(userId));
             result.Should().BeEquivalentTo(new List<Post>());
         }
 
@@ -140,13 +132,13 @@ namespace CommentImitationProject.UnitTests.Services
         public async Task GetCommentsByUserId_WithSomePosts_ShouldReturnCollection(Guid userId)
         {
             // Arrange
-            var comments = _fixture.Build<Comment>()
+            var comments = Fixture.Build<Comment>()
                 .With(x => x.AuthorId, userId)
                 .Without(x => x.Author)
                 .Without(x => x.Post)
                 .CreateMany().ToList();
 
-            _mockUnitOfWork.Setup(x => x.Comments.GetUserComments(userId))
+            MockUnitOfWork.Setup(x => x.Comments.GetUserComments(userId))
                 .ReturnsAsync(comments);
 
             var expectedComments = comments.Select(comment => new CommentDto
@@ -157,7 +149,7 @@ namespace CommentImitationProject.UnitTests.Services
             }).ToList();
 
             var calls = 0;
-            _mockMapper.Setup(x => x.Map<CommentDto>(It.IsAny<Comment>()))
+            MockMapper.Setup(x => x.Map<CommentDto>(It.IsAny<Comment>()))
                 .Returns(() => expectedComments[calls])
                 .Callback(() => calls++);
 
@@ -172,14 +164,14 @@ namespace CommentImitationProject.UnitTests.Services
         public async Task GetCommentsByPostId_NoPosts_ShouldReturnEmptyCollection(Guid postId)
         {
             // Arrange
-            _mockUnitOfWork.Setup(x => x.Comments.GetPostComments(postId))
+            MockUnitOfWork.Setup(x => x.Comments.GetPostComments(postId))
                 .ReturnsAsync(new List<Comment>());
 
             // Act
             var result = await _commentService.GetCommentsByPostId(postId);
 
             // Assert
-            _mockUnitOfWork.Verify(x => x.Comments.GetPostComments(postId));
+            MockUnitOfWork.Verify(x => x.Comments.GetPostComments(postId));
             result.Should().BeEquivalentTo(new List<Comment>());
         }
 
@@ -187,13 +179,13 @@ namespace CommentImitationProject.UnitTests.Services
         public async Task GetCommentsByPostId_WithSomePosts_ShouldReturnCollection(Guid postId)
         {
             // Arrange
-            var comments = _fixture.Build<Comment>()
+            var comments = Fixture.Build<Comment>()
                 .With(x => x.PostId, postId)
                 .Without(x => x.Author)
                 .Without(x => x.Post)
                 .CreateMany().ToList();
 
-            _mockUnitOfWork.Setup(x => x.Comments.GetPostComments(postId))
+            MockUnitOfWork.Setup(x => x.Comments.GetPostComments(postId))
                 .ReturnsAsync(comments);
 
             var expectedComments = comments.Select(comment => new CommentDto
@@ -204,7 +196,7 @@ namespace CommentImitationProject.UnitTests.Services
             }).ToList();
 
             var calls = 0;
-            _mockMapper.Setup(x => x.Map<CommentDto>(It.IsAny<Comment>()))
+            MockMapper.Setup(x => x.Map<CommentDto>(It.IsAny<Comment>()))
                 .Returns(() => expectedComments[calls])
                 .Callback(() => calls++);
 
@@ -219,41 +211,41 @@ namespace CommentImitationProject.UnitTests.Services
         public void Create_CommentCreated_VerifyUoW(string text, Guid userId, Guid postId)
         {
             // Arrange
-            _mockUnitOfWork.Setup(x => x.Comments.CreateAsync(It.IsAny<Comment>()));
+            MockUnitOfWork.Setup(x => x.Comments.CreateAsync(It.IsAny<Comment>()));
 
             // Act 
             _commentService.Create(text, userId, postId);
 
             // Assert
-            _mockUnitOfWork.Verify(x => x.Comments.CreateAsync(It.IsAny<Comment>()));
-            _mockUnitOfWork.Verify(x => x.CommitAsync());
+            MockUnitOfWork.Verify(x => x.Comments.CreateAsync(It.IsAny<Comment>()));
+            MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
         [Test, AutoData]
         public async Task Update_CommentUpdated_VerifyUoW(Guid commentId, string text)
         {
             // Arrange
-            var comment = _fixture.Build<Comment>()
+            var comment = Fixture.Build<Comment>()
                 .Without(x => x.Author)
                 .Without(x => x.Post)
                 .Create();
 
-            _mockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
+            MockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
                 .ReturnsAsync(comment);
 
             // Act
             await _commentService.Update(commentId, text);
 
             // Assert
-            _mockUnitOfWork.Verify(x => x.Comments.Update(comment));
-            _mockUnitOfWork.Verify(x => x.CommitAsync());
+            MockUnitOfWork.Verify(x => x.Comments.Update(comment));
+            MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
         [Test]
         public void Update_NoComment_ShouldThrowNullReferenceException()
         {
             // Arrange
-            _mockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
+            MockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
                 .ReturnsAsync((Comment) null);
 
             // Assert
@@ -264,27 +256,27 @@ namespace CommentImitationProject.UnitTests.Services
         public async Task Delete_CommentUpdated_VerifyUoW(Guid commentId)
         {
             // Arrange
-            var comment = _fixture.Build<Comment>()
+            var comment = Fixture.Build<Comment>()
                 .Without(x => x.Author)
                 .Without(x => x.Post)
                 .Create();
 
-            _mockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
+            MockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
                 .ReturnsAsync(comment);
 
             // Act
             await _commentService.Delete(commentId);
 
             // Assert
-            _mockUnitOfWork.Verify(x => x.Comments.Remove(comment));
-            _mockUnitOfWork.Verify(x => x.CommitAsync());
+            MockUnitOfWork.Verify(x => x.Comments.Remove(comment));
+            MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
         [Test]
         public void Delete_NoComment_ShouldThrowNullReferenceException()
         {
             // Arrange
-            _mockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
+            MockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
                 .ReturnsAsync((Comment) null);
 
             // Assert
