@@ -14,7 +14,7 @@ namespace CommentImitationProject.Services.Interfaces
 
         Task Create(string nickName);
 
-        void Edit(User user);
+        Task Edit(User user);
 
         Task Update(Guid userid, string nickName);
 

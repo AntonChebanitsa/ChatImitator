@@ -25,14 +25,18 @@ namespace CommentImitationProject.Services
         {
             var users = await _unitOfWork.Users.GetAll();
 
-            return users.Select(x => _mapper.Map<UserDto>(x));
+            return users.Count == 0
+                ? new List<UserDto>()
+                : users.Select(x => _mapper.Map<UserDto>(x));
         }
 
         public async Task<UserDto> GetById(Guid userId)
         {
             var user = await _unitOfWork.Users.GetById(userId);
 
-            return _mapper.Map<UserDto>(user);
+            return user == null
+                ? throw new NullReferenceException()
+                : _mapper.Map<UserDto>(user);
         }
 
         public async Task Create(string nickName)
@@ -43,41 +47,34 @@ namespace CommentImitationProject.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public void Edit(User user)
+        public async Task Edit(User user)
         {
             _unitOfWork.Users.Update(user);
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task Update(Guid userId, string nickName)
         {
-            try
-            {
-                var user = await _unitOfWork.Users.GetById(userId);
+            var user = await _unitOfWork.Users.GetById(userId);
 
-                user.NickName = nickName;
+            if (user == null)
+                throw new NullReferenceException();
 
-                _unitOfWork.Users.Update(user);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (NullReferenceException)
-            {
-                throw new NullReferenceException("Entity with this id doesn't exists");
-            }
+            user.NickName = nickName;
+
+            _unitOfWork.Users.Update(user);
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task Delete(Guid userId)
         {
-            try
-            {
-                var user = await _unitOfWork.Users.GetById(userId);
+            var user = await _unitOfWork.Users.GetById(userId);
 
-                _unitOfWork.Users.Remove(user);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (NullReferenceException)
-            {
-                throw new NullReferenceException("Entity with this id doesn't exists");
-            }
+            if (user == null)
+                throw new NullReferenceException();
+
+            _unitOfWork.Users.Remove(user);
+            await _unitOfWork.CommitAsync();
         }
     }
 }

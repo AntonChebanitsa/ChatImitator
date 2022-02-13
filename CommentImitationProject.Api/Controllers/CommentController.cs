@@ -20,7 +20,7 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                return Ok(await _commentService.GetCommentById(commentId));
+                return Ok(await _commentService.GetById(commentId));
             }
             catch (NullReferenceException)
             {
@@ -50,7 +50,7 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                return Ok(await _commentService.GetPostCommentsByPostId(postId));
+                return Ok(await _commentService.GetCommentsByPostId(postId));
             }
             catch (NullReferenceException)
             {
@@ -67,7 +67,7 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                return Ok(await _commentService.GetUserCommentsByUserId(userId));
+                return Ok(await _commentService.GetCommentsByUserId(userId));
             }
             catch (NullReferenceException)
             {
@@ -99,7 +99,7 @@ namespace CommentImitationProject.Controllers
         {
             try
             {
-                await _commentService.Edit(commentId, text);
+                await _commentService.Update(commentId, text);
 
                 return Ok();
             }
