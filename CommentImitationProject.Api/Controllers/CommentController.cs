@@ -29,13 +29,13 @@ namespace CommentImitationProject.Controllers
             {
                 return Ok(await _commentService.GetById(commentId));
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -46,9 +46,9 @@ namespace CommentImitationProject.Controllers
             {
                 return Ok(await _commentService.GetCommentsByPostId(postId));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -59,9 +59,9 @@ namespace CommentImitationProject.Controllers
             {
                 return Ok(await _commentService.GetCommentsByUserId(userId));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -74,9 +74,9 @@ namespace CommentImitationProject.Controllers
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -89,13 +89,13 @@ namespace CommentImitationProject.Controllers
 
                 return Ok();
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -108,13 +108,13 @@ namespace CommentImitationProject.Controllers
 
                 return Ok();
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
     }
