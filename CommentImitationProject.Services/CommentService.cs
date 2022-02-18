@@ -30,9 +30,12 @@ namespace CommentImitationProject.Services
                 : comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public async Task<CommentDto> GetById(Guid id)
+        public async Task<CommentDto> GetById(Guid commentId)
         {
-            var comment = await _unitOfWork.Comments.GetById(id);
+            if (commentId == Guid.Empty)
+                throw new ArgumentException(commentId.ToString());
+
+            var comment = await _unitOfWork.Comments.GetById(commentId);
 
             return comment == null
                 ? throw new NullReferenceException()
@@ -41,6 +44,9 @@ namespace CommentImitationProject.Services
 
         public async Task<IEnumerable<CommentDto>> GetCommentsByUserId(Guid userId)
         {
+            if (userId == Guid.Empty)
+                throw new ArgumentException(userId.ToString());
+
             var comments = await _unitOfWork.Comments.GetUserComments(userId);
 
             return !comments.Any()
@@ -50,6 +56,9 @@ namespace CommentImitationProject.Services
 
         public async Task<IEnumerable<CommentDto>> GetCommentsByPostId(Guid postId)
         {
+            if (postId == Guid.Empty)
+                throw new ArgumentException(postId.ToString());
+
             var comments = await _unitOfWork.Comments.GetPostComments(postId);
 
             return !comments.Any()
@@ -59,15 +68,21 @@ namespace CommentImitationProject.Services
 
         public async Task Create(string text, Guid userId, Guid postId)
         {
+            if (string.IsNullOrEmpty(text) || userId == Guid.Empty || postId == Guid.Empty)
+                throw new ArgumentException();
+
             var newComment = new Comment {AuthorId = userId, PostId = postId, Text = text, LastEditDate = DateTime.UtcNow};
 
             await _unitOfWork.Comments.CreateAsync(newComment);
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Update(Guid id, string text)
+        public async Task Update(Guid commentId, string text)
         {
-            var comment = await _unitOfWork.Comments.GetById(id);
+            if (string.IsNullOrEmpty(text) || commentId == Guid.Empty)
+                throw new ArgumentException();
+
+            var comment = await _unitOfWork.Comments.GetById(commentId);
 
             if (comment == null)
                 throw new NullReferenceException();
@@ -79,9 +94,12 @@ namespace CommentImitationProject.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid commentId)
         {
-            var comment = await _unitOfWork.Comments.GetById(id);
+            if (commentId == Guid.Empty)
+                throw new ArgumentException(commentId.ToString());
+
+            var comment = await _unitOfWork.Comments.GetById(commentId);
 
             if (comment == null)
                 throw new NullReferenceException();

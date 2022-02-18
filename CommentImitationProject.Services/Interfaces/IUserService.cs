@@ -12,11 +12,11 @@ namespace CommentImitationProject.Services.Interfaces
 
         Task<UserDto> GetById(Guid userId);
 
-        Task Create(string nickName);
+        Task Create(string nickname);
 
-        Task Edit(User user);
+        Task Edit(UserDto user);
 
-        Task Update(Guid userid, string nickName);
+        Task Update(Guid userid, string nickname);
 
         Task Delete(Guid userId);
     }
