@@ -25,11 +25,6 @@ namespace CommentImitationProject.DAL.Repositories
         {
             var entity = await _table.FirstOrDefaultAsync(x => x.Id.Equals(id));
 
-            if (entity == null)
-            {
-                throw new ArgumentException("Entity with this id doesn't exist");
-            }
-
             return entity;
         }
 
@@ -40,26 +35,12 @@ namespace CommentImitationProject.DAL.Repositories
 
         public void Update(T entity)
         {
-            if (entity != null)
-            {
-                _table.Update(entity);
-            }
-            else
-            {
-                throw new NullReferenceException("This entity does not exist");
-            }
+            _table.Update(entity);
         }
 
         public void Remove(T entity)
         {
-            if (entity != null)
-            {
-                _table.Remove(entity);
-            }
-            else
-            {
-                throw new NullReferenceException("This entity does not exist");
-            }
+            _table.Remove(entity);
         }
     }
 }
