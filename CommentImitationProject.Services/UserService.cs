@@ -32,6 +32,9 @@ namespace CommentImitationProject.Services
 
         public async Task<UserDto> GetById(Guid userId)
         {
+            if (userId == Guid.Empty)
+                throw new ArgumentException(userId.ToString());
+
             var user = await _unitOfWork.Users.GetById(userId);
 
             return user == null
@@ -39,28 +42,36 @@ namespace CommentImitationProject.Services
                 : _mapper.Map<UserDto>(user);
         }
 
-        public async Task Create(string nickName)
+        public async Task Create(string nickname)
         {
-            var user = new User {NickName = nickName, RegistrationDate = DateTime.UtcNow.Date};
+            if (string.IsNullOrEmpty(nickname))
+                throw new ArgumentException(nickname);
+
+            var user = new User {NickName = nickname, RegistrationDate = DateTime.UtcNow.Date};
 
             await _unitOfWork.Users.CreateAsync(user);
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Edit(User user)
+        public async Task Edit(UserDto userDto)
         {
-            _unitOfWork.Users.Update(user);
+            _unitOfWork.Users.Update(_mapper.Map<User>(userDto));
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Update(Guid userId, string nickName)
+        public async Task Update(Guid userId, string nickname)
         {
+            if (userId == Guid.Empty || string.IsNullOrEmpty(nickname))
+                throw new ArgumentException(userId == Guid.Empty
+                    ? userId.ToString()
+                    : nickname);
+
             var user = await _unitOfWork.Users.GetById(userId);
 
             if (user == null)
                 throw new NullReferenceException();
 
-            user.NickName = nickName;
+            user.NickName = nickname;
 
             _unitOfWork.Users.Update(user);
             await _unitOfWork.CommitAsync();
@@ -68,6 +79,11 @@ namespace CommentImitationProject.Services
 
         public async Task Delete(Guid userId)
         {
+            if (userId == Guid.Empty)
+            {
+                throw new ArgumentException(userId.ToString());
+            }
+
             var user = await _unitOfWork.Users.GetById(userId);
 
             if (user == null)

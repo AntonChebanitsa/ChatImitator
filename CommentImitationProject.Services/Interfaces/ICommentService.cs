@@ -7,7 +7,7 @@ namespace CommentImitationProject.Services.Interfaces
 {
     public interface ICommentService
     {
-        Task<CommentDto> GetById(Guid id);
+        Task<CommentDto> GetById(Guid commentId);
 
         Task<IEnumerable<CommentDto>> GetAll();
 
@@ -19,6 +19,6 @@ namespace CommentImitationProject.Services.Interfaces
 
         Task Update(Guid id, string text);
 
-        Task Delete(Guid id);
+        Task Delete(Guid commentId);
     }
 }
