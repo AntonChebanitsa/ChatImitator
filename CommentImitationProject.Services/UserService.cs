@@ -12,6 +12,10 @@ namespace CommentImitationProject.Services
 {
     public class UserService : IUserService
     {
+        private const string IncorrectParameterMessage = "Incorrect parameter";
+        private const string UserNotExistMessage = "User with this id doesn't exist";
+        private const string NicknameShouldBeNotEmptyMessage = "Nickname should be not empty";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
@@ -33,19 +37,20 @@ namespace CommentImitationProject.Services
         public async Task<UserDto> GetById(Guid userId)
         {
             if (userId == Guid.Empty)
-                throw new ArgumentException(userId.ToString());
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(userId)}: {userId}");
 
             var user = await _unitOfWork.Users.GetById(userId);
 
-            return user == null
-                ? throw new NullReferenceException()
-                : _mapper.Map<UserDto>(user);
+            if (user == null)
+                throw new NullReferenceException(UserNotExistMessage);
+
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task Create(string nickname)
         {
             if (string.IsNullOrEmpty(nickname))
-                throw new ArgumentException(nickname);
+                throw new ArgumentException(NicknameShouldBeNotEmptyMessage);
 
             var user = new User {NickName = nickname, RegistrationDate = DateTime.UtcNow.Date};
 
@@ -61,15 +66,16 @@ namespace CommentImitationProject.Services
 
         public async Task Update(Guid userId, string nickname)
         {
-            if (userId == Guid.Empty || string.IsNullOrEmpty(nickname))
-                throw new ArgumentException(userId == Guid.Empty
-                    ? userId.ToString()
-                    : nickname);
+            if (userId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(userId)}: {userId}");
+
+            if (string.IsNullOrEmpty(nickname))
+                throw new ArgumentException(NicknameShouldBeNotEmptyMessage);
 
             var user = await _unitOfWork.Users.GetById(userId);
 
             if (user == null)
-                throw new NullReferenceException();
+                throw new NullReferenceException(UserNotExistMessage);
 
             user.NickName = nickname;
 
@@ -80,14 +86,12 @@ namespace CommentImitationProject.Services
         public async Task Delete(Guid userId)
         {
             if (userId == Guid.Empty)
-            {
-                throw new ArgumentException(userId.ToString());
-            }
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(userId)}: {userId}");
 
             var user = await _unitOfWork.Users.GetById(userId);
 
             if (user == null)
-                throw new NullReferenceException();
+                throw new NullReferenceException(UserNotExistMessage);
 
             _unitOfWork.Users.Remove(user);
             await _unitOfWork.CommitAsync();

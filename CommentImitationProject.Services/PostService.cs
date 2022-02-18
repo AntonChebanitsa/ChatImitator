@@ -12,6 +12,10 @@ namespace CommentImitationProject.Services
 {
     public class PostService : IPostService
     {
+        private const string IncorrectParameterMessage = "Incorrect parameter";
+        private const string PostNotExistMessage = "Post with this id doesn't exist";
+        private const string NicknameShouldBeNotEmptyMessage = "Post text should be not empty";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
@@ -33,33 +37,35 @@ namespace CommentImitationProject.Services
         public async Task<PostDto> GetById(Guid postId)
         {
             if (postId == Guid.Empty)
-                throw new ArgumentException(postId.ToString());
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(postId)}: {postId}");
 
             var post = await _unitOfWork.Posts.GetById(postId);
 
-            return post == null
-                ? throw new NullReferenceException()
-                : _mapper.Map<PostDto>(post);
+            if (post == null)
+                throw new NullReferenceException(PostNotExistMessage);
+
+            return _mapper.Map<PostDto>(post);
         }
 
         public async Task<IEnumerable<PostDto>> GetUserPostsById(Guid userId)
         {
             if (userId == Guid.Empty)
-                throw new ArgumentException(userId.ToString());
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(userId)}: {userId}");
 
             var posts = (await _unitOfWork.Posts.GetPostsByUserId(userId)).ToList();
 
             return !posts.Any()
                 ? new List<PostDto>()
-                : posts.Select(x => _mapper.Map<PostDto>(x));
+                : posts.Select(post => _mapper.Map<PostDto>(post));
         }
 
         public async Task Create(Guid userId, string text)
         {
-            if (string.IsNullOrEmpty(text) || userId == Guid.Empty)
-            {
-                throw new ArgumentException();
-            }
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentException(NicknameShouldBeNotEmptyMessage);
+
+            if (userId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(userId)}: {userId}");
 
             var post = new Post {Text = text, PublicationDate = DateTime.UtcNow, AuthorId = userId};
 
@@ -69,13 +75,16 @@ namespace CommentImitationProject.Services
 
         public async Task Update(Guid postId, string text)
         {
-            if (postId == Guid.Empty || string.IsNullOrEmpty(text))
-                throw new ArgumentException();
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentException(NicknameShouldBeNotEmptyMessage);
+
+            if (postId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(postId)}: {postId}");
 
             var post = await _unitOfWork.Posts.GetById(postId);
 
             if (post == null)
-                throw new NullReferenceException();
+                throw new NullReferenceException(PostNotExistMessage);
 
             post.Text = text;
 
@@ -86,12 +95,12 @@ namespace CommentImitationProject.Services
         public async Task Delete(Guid postId)
         {
             if (postId == Guid.Empty)
-                throw new AggregateException(postId.ToString());
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(postId)}: {postId}");
 
             var post = await _unitOfWork.Posts.GetById(postId);
 
             if (post == null)
-                throw new NullReferenceException();
+                throw new NullReferenceException(PostNotExistMessage);
 
             _unitOfWork.Posts.Remove(post);
             await _unitOfWork.CommitAsync();

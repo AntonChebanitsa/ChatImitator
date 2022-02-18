@@ -29,13 +29,13 @@ namespace CommentImitationProject.Controllers
             {
                 return Ok(await _postService.GetById(postId));
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -46,9 +46,9 @@ namespace CommentImitationProject.Controllers
             {
                 return Ok(await _postService.GetUserPostsById(userId));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -61,9 +61,9 @@ namespace CommentImitationProject.Controllers
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -76,13 +76,13 @@ namespace CommentImitationProject.Controllers
 
                 return Ok();
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -95,13 +95,13 @@ namespace CommentImitationProject.Controllers
 
                 return Ok();
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
     }
