@@ -102,14 +102,25 @@ namespace CommentImitationProject.UnitTests.Services
         }
 
         [Test]
-        public void GetById_NoUser_ShouldThrowNullReferenceException()
+        public void GetById_InvalidId_ShouldThrowArgumentException()
         {
             // Arrange
             MockUnitOfWork.Setup(x => x.Users.GetById(new Guid()))
                 .ReturnsAsync((User) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _userService.GetById(new Guid()));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _userService.GetById(new Guid()));
+        }
+
+        [Test, AutoData]
+        public void GetById_NoUser_ShouldThrowNullReferenceException(Guid userId)
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Users.GetById(userId))
+                .ReturnsAsync((User) null);
+
+            // Assert
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _userService.GetById(userId));
         }
 
         [Test, AutoData]
@@ -130,7 +141,7 @@ namespace CommentImitationProject.UnitTests.Services
         public void Edit_UserEdited_VerifyUoW()
         {
             // Arrange
-            var user = Fixture.Build<User>()
+            var user = Fixture.Build<UserDto>()
                 .Without(x => x.Comments)
                 .Without(x => x.Posts)
                 .Create();
@@ -141,7 +152,7 @@ namespace CommentImitationProject.UnitTests.Services
             _userService.Edit(user);
 
             // Assert
-            MockUnitOfWork.Verify(x => x.Users.Update(user));
+            MockUnitOfWork.Verify(x => x.Users.Update(It.IsAny<User>()));
             MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
@@ -167,14 +178,36 @@ namespace CommentImitationProject.UnitTests.Services
         }
 
         [Test]
-        public void Update_NoUser_ShouldThrowNullReferenceException()
+        public void Update_InvalidId_ShouldThrowArgumentException()
         {
             // Arrange
             MockUnitOfWork.Setup(x => x.Users.GetById(new Guid()))
                 .ReturnsAsync((User) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _userService.Update(new Guid(), string.Empty));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _userService.Update(new Guid(), string.Empty));
+        }
+
+        [Test, AutoData]
+        public void Update_NoUser_ShouldThrowNullReferenceException(Guid userId, string nickname)
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Users.GetById(userId))
+                .ReturnsAsync((User) null);
+
+            // Assert
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _userService.Update(userId, nickname));
+        }
+
+        [Test, AutoData]
+        public void Update_InvalidNickname_ShouldThrowArgumentException(Guid userId)
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Users.GetById(userId))
+                .ReturnsAsync((User) null);
+
+            // Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await _userService.Update(userId, string.Empty));
         }
 
         [Test, AutoData]
@@ -199,14 +232,25 @@ namespace CommentImitationProject.UnitTests.Services
         }
 
         [Test]
-        public void Delete_NoUser_ShouldThrowNullReferenceException()
+        public void Delete_InvalidId_ShouldThrowArgumentException()
         {
             // Arrange
             MockUnitOfWork.Setup(x => x.Users.GetById(new Guid()))
                 .ReturnsAsync((User) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _userService.Delete(new Guid()));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _userService.Delete(new Guid()));
+        }
+
+        [Test]
+        public void Delete_NoUser_ShouldThrowNullReferenceException()
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Users.GetById(Guid.NewGuid()))
+                .ReturnsAsync((User) null);
+
+            // Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await _userService.Delete(new Guid()));
         }
     }
 }
