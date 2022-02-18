@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CommentImitationProject.Models;
 using CommentImitationProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,14 +19,7 @@ namespace CommentImitationProject.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                return Ok(await _postService.GetAll());
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
+            return Ok(await _postService.GetAll());
         }
 
         [HttpGet("{postId:guid}")]
@@ -45,16 +39,12 @@ namespace CommentImitationProject.Controllers
             }
         }
 
-        [HttpGet("{userId:guid}")]
-        public async Task<IActionResult> GetUserPostsById(Guid userId)
+        [HttpGet("GetPostsByUserId/{userId:guid}")]
+        public async Task<IActionResult> GetPostsByUserId(Guid userId)
         {
             try
             {
                 return Ok(await _postService.GetUserPostsById(userId));
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound();
             }
             catch (Exception)
             {
@@ -63,11 +53,11 @@ namespace CommentImitationProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Guid userId, string text)
+        public async Task<IActionResult> Create([FromBody] CreatePostModel model)
         {
             try
             {
-                await _postService.Create(userId, text);
+                await _postService.Create(model.PostId, model.Text);
 
                 return Ok();
             }
@@ -78,11 +68,11 @@ namespace CommentImitationProject.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> Update([FromBody] Guid postId, string text)
+        public async Task<IActionResult> Update([FromBody] UpdatePostModel model)
         {
             try
             {
-                await _postService.Update(postId, text);
+                await _postService.Update(model.PostId, model.Text);
 
                 return Ok();
             }

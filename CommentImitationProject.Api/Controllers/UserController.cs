@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CommentImitationProject.DAL.Entities;
+using CommentImitationProject.DTO;
+using CommentImitationProject.Models;
 using CommentImitationProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,14 +20,7 @@ namespace CommentImitationProject.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                return Ok(await _userService.GetAll());
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
+            return Ok(await _userService.GetAll());
         }
 
         [HttpGet("{userId:guid}")]
@@ -62,17 +56,13 @@ namespace CommentImitationProject.Controllers
         }
 
         [HttpPut]
-        public IActionResult Edit([FromBody] User user)
+        public IActionResult Edit([FromBody] UserDto user)
         {
             try
             {
                 _userService.Edit(user);
 
                 return Ok();
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound();
             }
             catch (Exception)
             {
@@ -81,11 +71,11 @@ namespace CommentImitationProject.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> Update([FromBody] Guid userId, string nickName)
+        public async Task<IActionResult> Update([FromBody] UpdateUserModel model)
         {
             try
             {
-                await _userService.Update(userId, nickName);
+                await _userService.Update(model.UserId, model.Nickname);
 
                 return Ok();
             }

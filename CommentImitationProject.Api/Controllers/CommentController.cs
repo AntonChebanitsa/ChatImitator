@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CommentImitationProject.Models;
 using CommentImitationProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,12 @@ namespace CommentImitationProject.Controllers
         public CommentController(ICommentService commentService)
         {
             _commentService = commentService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _commentService.GetAll());
         }
 
         [HttpGet("{commentId:guid}")]
@@ -32,46 +39,25 @@ namespace CommentImitationProject.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            try
-            {
-                return Ok(await _commentService.GetAll());
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-
-        [HttpGet("{postId:guid}")]
-        public async Task<IActionResult> GetByPostId(Guid postId)
+        [HttpGet("GetCommentsByPostId/{postId:guid}")]
+        public async Task<IActionResult> GetCommentsByPostId(Guid postId)
         {
             try
             {
                 return Ok(await _commentService.GetCommentsByPostId(postId));
             }
-            catch (NullReferenceException)
-            {
-                return NotFound();
-            }
             catch (Exception)
             {
                 return BadRequest();
             }
         }
 
-        [HttpGet("{userId:guid}")]
-        public async Task<IActionResult> GetByUserId(Guid userId)
+        [HttpGet("GetCommentsByUserId/{userId:guid}")]
+        public async Task<IActionResult> GetCommentsByUserId(Guid userId)
         {
             try
             {
                 return Ok(await _commentService.GetCommentsByUserId(userId));
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound();
             }
             catch (Exception)
             {
@@ -80,11 +66,11 @@ namespace CommentImitationProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] string text, Guid userId, Guid postId)
+        public async Task<IActionResult> Create([FromBody] CreateCommentModel model)
         {
             try
             {
-                await _commentService.Create(text, userId, postId);
+                await _commentService.Create(model.Text, model.UserId, model.PostId);
 
                 return Ok();
             }
@@ -95,11 +81,11 @@ namespace CommentImitationProject.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> Update([FromBody] Guid commentId, string text)
+        public async Task<IActionResult> Update([FromBody] UpdateCommentModel model)
         {
             try
             {
-                await _commentService.Update(commentId, text);
+                await _commentService.Update(model.CommentId, model.Text);
 
                 return Ok();
             }
