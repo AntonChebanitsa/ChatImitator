@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.NUnit3;
@@ -102,15 +103,26 @@ namespace CommentImitationProject.UnitTests.Services
             result.Should().BeEquivalentTo(expectedComment);
         }
 
+        [Test, AutoData]
+        public void GetById_NoComments_ShouldThrowNullReferenceException(Guid commentId)
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
+                .ReturnsAsync((Comment) null);
+
+            // Assert
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _commentService.GetById(commentId));
+        }
+
         [Test]
-        public void GetById_NoPost_ShouldThrowNullReferenceException()
+        public void GetById_InvalidData_ShouldThrowArgumentException()
         {
             // Arrange
             MockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
                 .ReturnsAsync((Comment) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _commentService.GetById(new Guid()));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _commentService.GetById(new Guid()));
         }
 
         [Test, AutoData]
@@ -241,15 +253,26 @@ namespace CommentImitationProject.UnitTests.Services
             MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
+        [Test, AutoData]
+        public void Update_NoComment_ShouldThrowNullReferenceException(Guid commentId, string text)
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
+                .ReturnsAsync((Comment) null);
+
+            // Assert
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _commentService.Update(commentId, text));
+        }
+
         [Test]
-        public void Update_NoComment_ShouldThrowNullReferenceException()
+        public void Update_InvalidData_ShouldThrowArgumentException()
         {
             // Arrange
             MockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
                 .ReturnsAsync((Comment) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _commentService.Update(new Guid(), string.Empty));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _commentService.Update(new Guid(), string.Empty));
         }
 
         [Test, AutoData]
@@ -272,15 +295,26 @@ namespace CommentImitationProject.UnitTests.Services
             MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
+        [Test, AutoData]
+        public void Delete_NoComment_ShouldThrowNullReferenceException(Guid commentId)
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Comments.GetById(commentId))
+                .ReturnsAsync((Comment) null);
+
+            // Assert
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _commentService.Delete(commentId));
+        }
+
         [Test]
-        public void Delete_NoComment_ShouldThrowNullReferenceException()
+        public void Delete_InvalidData_ShouldThrowNullReferenceException()
         {
             // Arrange
             MockUnitOfWork.Setup(x => x.Comments.GetById(new Guid()))
                 .ReturnsAsync((Comment) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _commentService.Delete(new Guid()));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _commentService.Delete(new Guid()));
         }
     }
 }

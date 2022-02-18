@@ -102,15 +102,26 @@ namespace CommentImitationProject.UnitTests.Services
             result.Should().BeEquivalentTo(expectedPost);
         }
 
-        [Test]
-        public void GetById_NoPost_ShouldThrowNullReferenceException()
+        [Test, AutoData]
+        public void GetById_NoPost_ShouldThrowNullReferenceException(Guid postId)
         {
             // Arrange
-            MockUnitOfWork.Setup(x => x.Posts.GetById(new Guid()))
+            MockUnitOfWork.Setup(x => x.Posts.GetById(postId))
                 .ReturnsAsync((Post) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _postService.GetById(new Guid()));
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _postService.GetById(postId));
+        }
+
+        [Test]
+        public void GetById_EmptyGuid_ShouldThrowArgumentException()
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Posts.GetById(Guid.Empty))
+                .ReturnsAsync((Post) null);
+
+            // Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await _postService.GetById(Guid.Empty));
         }
 
         [Test, AutoData]
@@ -195,15 +206,26 @@ namespace CommentImitationProject.UnitTests.Services
             MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
-        [Test]
-        public void Update_NoUser_ShouldThrowNullReferenceException()
+        [Test, AutoData]
+        public void Update_NoUser_ShouldThrowArgumentException(Guid postId)
         {
             // Arrange
-            MockUnitOfWork.Setup(x => x.Posts.GetById(new Guid()))
+            MockUnitOfWork.Setup(x => x.Posts.GetById(postId))
                 .ReturnsAsync((Post) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _postService.Update(new Guid(), string.Empty));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _postService.Update(postId, string.Empty));
+        }
+
+        [Test, AutoData]
+        public void Update_NoUser_ShouldThrowNullReferenceException(Guid postId, string text)
+        {
+            // Arrange
+            MockUnitOfWork.Setup(x => x.Posts.GetById(postId))
+                .ReturnsAsync((Post) null);
+
+            // Assert
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _postService.Update(postId, text));
         }
 
         [Test, AutoData]
@@ -227,15 +249,15 @@ namespace CommentImitationProject.UnitTests.Services
             MockUnitOfWork.Verify(x => x.CommitAsync());
         }
 
-        [Test]
-        public void Delete_NoUser_ShouldThrowNullReferenceException()
+        [Test, AutoData]
+        public void Delete_NoUser_ShouldThrowNullReferenceException(Guid postId)
         {
             // Arrange
-            MockUnitOfWork.Setup(x => x.Posts.GetById(new Guid()))
+            MockUnitOfWork.Setup(x => x.Posts.GetById(postId))
                 .ReturnsAsync((Post) null);
 
             // Assert
-            Assert.ThrowsAsync<NullReferenceException>(async () => await _postService.Delete(new Guid()));
+            Assert.ThrowsAsync<NullReferenceException>(async () => await _postService.Delete(postId));
         }
     }
 }
