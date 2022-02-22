@@ -1,49 +1,111 @@
-﻿// using System;
-// using CommentImitationProject.DAL.Entities;
-// using Microsoft.AspNetCore.Mvc;
-//
-// namespace CommentImitationProject.Controllers
-// {
-//     public class UserController : Controller
-//     {
-//         [HttpGet]
-//         public Task<IActionResult> GetAll()
-//         {
-//             // get all users
-//             return Task.FromResult(Ok("asd"));
-//         }
-//
-//         [HttpGet("{id}")]
-//         public Task<IActionResult> GetById(Guid postId)
-//         {
-//             //get user by id
-//             return Task.FromResult(Ok("asd"));
-//         }
-//
-//         [HttpPost]
-//         public Task<IActionResult> Create([FromBody] User user)
-//         {
-//             //add new user to db
-//             return new Task<IActionResult>();
-//         }
-//
-//         [HttpPut]
-//         public Task<IActionResult> Edit([FromBody] User user)
-//         {
-//             return new Task<IActionResult>();
-//         }
-//
-//         [HttpPatch]
-//         [Route "update-email"]
-//         public Task<IActionResult> Update([FromBody] Guid userId, string email)
-//         {
-//             return new Task<IActionResult>();
-//         }
-//
-//         [HttpDelete("{id}")]
-//         public Task<IActionResult> Delete(Guid userId)
-//         {
-//             return new Task<IActionResult>();
-//         }
-//     }
-// }
+﻿using System;
+using System.Threading.Tasks;
+using CommentImitationProject.DTO;
+using CommentImitationProject.Models;
+using CommentImitationProject.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+
+namespace CommentImitationProject.Controllers
+{
+    [Route("api/[controller]")]
+    public class UserController : Controller
+    {
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _userService.GetAll());
+        }
+
+        [HttpGet("{userId:guid}")]
+        public async Task<IActionResult> GetById(Guid userId)
+        {
+            try
+            {
+                return Ok(await _userService.GetById(userId));
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] string nickName)
+        {
+            try
+            {
+                await _userService.Create(nickName);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        public IActionResult Edit([FromBody] UserDto user)
+        {
+            try
+            {
+                _userService.Edit(user);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> Update([FromBody] UpdateUserModel model)
+        {
+            try
+            {
+                await _userService.Update(model.UserId, model.Nickname);
+
+                return Ok();
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{userId:guid}")]
+        public async Task<IActionResult> Delete(Guid userId)
+        {
+            try
+            {
+                await _userService.Delete(userId);
+
+                return Ok();
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }
+}
