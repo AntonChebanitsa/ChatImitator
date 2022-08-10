@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using CommentImitationProject.DTO;
+using CommentImitationProject.Models;
 using CommentImitationProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommentImitationProject.Controllers
 {
+    [Route("api/[controller]")]
     public class CommentController : Controller
     {
         private readonly ICommentService _commentService;
@@ -17,119 +17,105 @@ namespace CommentImitationProject.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            IEnumerable<CommentDto> comments;
-
-            try
-            {
-                comments = _commentService.GetAllComments();
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound();
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-
-            return Ok(comments);
+            return Ok(await _commentService.GetAll());
         }
 
-        [HttpGet("postid={postId:guid}")]
-        public IActionResult GetByPostId(Guid postId)
+        [HttpGet("{commentId:guid}")]
+        public async Task<IActionResult> GetById(Guid commentId)
         {
-            IEnumerable<CommentDto> comments;
-
             try
             {
-                comments = _commentService.GetPostComments(postId);
+                return Ok(await _commentService.GetById(commentId));
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
-
-            return Ok(comments);
         }
 
-        [HttpGet("userid={userId:guid}")]
-        public IActionResult GetByUserId(Guid userId)
+        [HttpGet("GetCommentsByPostId/{postId:guid}")]
+        public async Task<IActionResult> GetCommentsByPostId(Guid postId)
         {
-            IEnumerable<CommentDto> comments;
-
             try
             {
-                comments = _commentService.GetUserComments(userId);
+                return Ok(await _commentService.GetCommentsByPostId(postId));
             }
-            catch (NullReferenceException)
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
+        }
 
-            return Ok(comments);
+        [HttpGet("GetCommentsByUserId/{userId:guid}")]
+        public async Task<IActionResult> GetCommentsByUserId(Guid userId)
+        {
+            try
+            {
+                return Ok(await _commentService.GetCommentsByUserId(userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] string text, Guid userId, Guid postId)
+        public async Task<IActionResult> Create([FromBody] CreateCommentModel model)
         {
             try
             {
-                await _commentService.CreateComment(text, userId, postId);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
+                await _commentService.Create(model.Text, model.UserId, model.PostId);
 
-            return Accepted();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPatch]
-        public async Task<IActionResult> Update([FromBody] Guid commentId, string text)
+        public async Task<IActionResult> Update([FromBody] UpdateCommentModel model)
         {
             try
             {
-                await _commentService.EditComment(commentId, text);
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound();
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
+                await _commentService.Update(model.CommentId, model.Text);
 
-            return Ok();
+                return Ok();
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        [HttpDelete("{commentId}")]
+        [HttpDelete("{commentId:guid}")]
         public async Task<IActionResult> Delete(Guid commentId)
         {
             try
             {
-                await _commentService.DeleteComment(commentId);
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound();
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
+                await _commentService.Delete(commentId);
 
-            return Ok();
+                return Ok();
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

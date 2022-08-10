@@ -5,7 +5,7 @@ namespace CommentImitationProject.DAL.Repositories
 {
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
-        protected UserRepository(ProjectContext dbProjectContext) : base(dbProjectContext)
+        public UserRepository(ProjectContext dbProjectContext) : base(dbProjectContext)
         {
         }
     }

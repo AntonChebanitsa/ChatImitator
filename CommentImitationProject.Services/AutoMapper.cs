@@ -9,8 +9,8 @@ namespace CommentImitationProject.Services
         public AutoMapper()
         {
             CreateMap<Comment, CommentDto>().ReverseMap();
-            // CreateMap<User, UserDto>().ReverseMap();
-            // CreateMap<Post, PostDto>().ReverseMap();
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<Post, PostDto>().ReverseMap();
         }
     }
 }
