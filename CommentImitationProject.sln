@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentImitationProject.Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentImitationProject.IntegrationTests", "CommentImitationProject.IntegrationTests\CommentImitationProject.IntegrationTests.csproj", "{0405D985-6D77-40E2-BB00-0792E35617A0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4D4877FE-DB0A-4ACC-8D81-5C5341714488}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentImitationProject.Tests.Behavior", "CommentImitationProject.Tests.Behavior\CommentImitationProject.Tests.Behavior.csproj", "{EFC4B9D3-AF23-49E3-A3D3-EA5157F5C54C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +46,13 @@ Global
 		{0405D985-6D77-40E2-BB00-0792E35617A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0405D985-6D77-40E2-BB00-0792E35617A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0405D985-6D77-40E2-BB00-0792E35617A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC4B9D3-AF23-49E3-A3D3-EA5157F5C54C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC4B9D3-AF23-49E3-A3D3-EA5157F5C54C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC4B9D3-AF23-49E3-A3D3-EA5157F5C54C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC4B9D3-AF23-49E3-A3D3-EA5157F5C54C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8228E92B-4A81-4340-9490-1785D51BC86B} = {4D4877FE-DB0A-4ACC-8D81-5C5341714488}
+		{EFC4B9D3-AF23-49E3-A3D3-EA5157F5C54C} = {4D4877FE-DB0A-4ACC-8D81-5C5341714488}
 	EndGlobalSection
 EndGlobal
