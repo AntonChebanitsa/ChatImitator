@@ -1,22 +1,20 @@
-Feature: You should get comment by its id
+Feature: User is requesting comment by its id
 
 Scenario: Id is empty guid.
 	Given Guid id is empty.
 	Then ArgumentException should be thrown.
 
 Scenario: No connection with database.
-	Given Guid is correct.
-	But Something wrong with database connention.
-	Then DbException should be thrown.
+	Given Guid id not empty.
+	But Something wrong with database.
+	Then Exception should be thrown.
 
 Scenario: There isn't comment with this id.
-	Given Guid isn't empty.
-	And Database connection is ok.
-	But There isn't comment with this id.
-	Then ArgumentException should be thrown.
+	Given Guid id not empty.
+	But Comment with this id not exists.
+	Then NullReferenceException should be thrown.
 
-Scenario: Succesfull path.
-	Given Correct guid id.
-	And Database connection is ok.
+Scenario: Successful path.
+	Given Guid id not empty.
 	And Comment with this id exists.
 	Then Should return mapped comment.
