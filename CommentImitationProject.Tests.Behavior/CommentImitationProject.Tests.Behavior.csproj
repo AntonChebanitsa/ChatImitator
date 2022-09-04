@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="Hooks" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoFixture" Version="4.17.0" />
+        <PackageReference Include="FluentAssertions" Version="6.7.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0-preview-20220726-02" />
+        <PackageReference Include="Moq" Version="4.18.2" />
+        <PackageReference Include="SpecFlow.NUnit" Version="4.0.16-beta" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CommentImitationProject.Services\CommentImitationProject.Services.csproj" />
+    </ItemGroup>
+
+</Project>

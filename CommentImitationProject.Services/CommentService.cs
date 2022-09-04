@@ -12,6 +12,10 @@ namespace CommentImitationProject.Services
 {
     public class CommentService : ICommentService
     {
+        private const string IncorrectParameterMessage = "Incorrect parameter";
+        private const string CommentNotExistMessage = "Comment with this id doesn't exist";
+        private const string CommentTextShouldBeNotEmptyMessage = "Comment text should be not empty";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
@@ -21,101 +25,100 @@ namespace CommentImitationProject.Services
             _mapper = mapper;
         }
 
-        public async Task<CommentDto> GetConcreteComment(Guid id)
+        public async Task<IEnumerable<CommentDto>> GetAll()
         {
-            try
-            {
-                var entity = await _unitOfWork.Comments.GetById(id);
+            var comments = await _unitOfWork.Comments.GetAll();
 
-                return _mapper.Map<CommentDto>(entity);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return comments.Count == 0
+                ? new List<CommentDto>()
+                : comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public IEnumerable<CommentDto> GetAllComments()
+        public async Task<CommentDto> GetById(Guid commentId)
         {
-            var entities = _unitOfWork.Comments.GetAll();
+            if (commentId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(commentId)}: {commentId}");
 
-            return entities.Select(x => _mapper.Map<CommentDto>(x));
+            var comment = await _unitOfWork.Comments.GetById(commentId);
+
+            if (comment == null)
+                throw new NullReferenceException(CommentNotExistMessage);
+
+            return _mapper.Map<CommentDto>(comment);
         }
 
-        public IEnumerable<CommentDto> GetUserComments(Guid userId)
+        public async Task<IEnumerable<CommentDto>> GetCommentsByUserId(Guid userId)
         {
-            var comments = _unitOfWork.Comments.GetUserComments(userId);
+            if (userId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(userId)}: {userId}");
 
-            return comments.Select(x => _mapper.Map<CommentDto>(x));
+            var comments = await _unitOfWork.Comments.GetUserComments(userId);
+
+            return !comments.Any()
+                ? new List<CommentDto>()
+                : comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public IEnumerable<CommentDto> GetPostComments(Guid postId)
+        public async Task<IEnumerable<CommentDto>> GetCommentsByPostId(Guid postId)
         {
-            var comments = _unitOfWork.Comments.GetPostComments(postId);
+            if (postId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(postId)}: {postId}");
 
-            return comments.Select(x => _mapper.Map<CommentDto>(x));
+            var comments = await _unitOfWork.Comments.GetPostComments(postId);
+
+            return !comments.Any()
+                ? new List<CommentDto>()
+                : comments.Select(x => _mapper.Map<CommentDto>(x));
         }
 
-        public IEnumerable<CommentDto> GetByUserAndPost(Guid postId, Guid userId)
+        public async Task Create(string text, Guid userId, Guid postId)
         {
-            var comments = _unitOfWork.Comments.GetByPostAndUser(postId, userId);
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentException(CommentTextShouldBeNotEmptyMessage);
 
-            return comments.Select(x => _mapper.Map<CommentDto>(x));
-        }
+            if (userId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(userId)}: {userId}");
 
-        public async Task CreateComment(string text, Guid userId, Guid postId)
-        {
+            if (postId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(postId)}: {postId}");
+
             var newComment = new Comment {AuthorId = userId, PostId = postId, Text = text, LastEditDate = DateTime.UtcNow};
 
             await _unitOfWork.Comments.CreateAsync(newComment);
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task EditComment(Guid id, string text)
+        public async Task Update(Guid commentId, string text)
         {
-            try
-            {
-                var commentToEdit = await _unitOfWork.Comments.GetById(id);
-                commentToEdit.Text = text;
-                commentToEdit.LastEditDate = DateTime.UtcNow;
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentException(CommentTextShouldBeNotEmptyMessage);
 
-                _unitOfWork.Comments.Update(commentToEdit);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
+            if (commentId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(commentId)}: {commentId}");
 
-        public async Task DeleteComment(Guid id)
-        {
-            try
-            {
-                var commentToDelete = await _unitOfWork.Comments.GetById(id);
+            var comment = await _unitOfWork.Comments.GetById(commentId);
 
-                _unitOfWork.Comments.Remove(commentToDelete);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
+            if (comment == null)
+                throw new NullReferenceException(CommentNotExistMessage);
 
-        public async Task DeleteUserComments(Guid userId)
-        {
-            var userComments = _unitOfWork.Comments.GetUserComments(userId);
+            comment.Text = text;
+            comment.LastEditDate = DateTime.UtcNow;
 
-            _unitOfWork.Comments.RemoveRange(userComments);
+            _unitOfWork.Comments.Update(comment);
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task DeletePostComments(Guid postId)
+        public async Task Delete(Guid commentId)
         {
-            var userComments = _unitOfWork.Comments.GetPostComments(postId);
+            if (commentId == Guid.Empty)
+                throw new ArgumentException($"{IncorrectParameterMessage} {nameof(commentId)}: {commentId}");
 
-            _unitOfWork.Comments.RemoveRange(userComments);
+            var comment = await _unitOfWork.Comments.GetById(commentId);
+
+            if (comment == null)
+                throw new NullReferenceException(CommentNotExistMessage);
+
+            _unitOfWork.Comments.Remove(comment);
             await _unitOfWork.CommitAsync();
         }
     }

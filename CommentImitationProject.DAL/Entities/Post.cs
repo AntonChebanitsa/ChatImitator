@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CommentImitationProject.DAL.Entities
 {
@@ -12,5 +13,7 @@ namespace CommentImitationProject.DAL.Entities
 
         public Guid AuthorId { get; set; }
         public virtual User Author { get; set; }
+
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }
